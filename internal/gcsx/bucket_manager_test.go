@@ -19,6 +19,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/googlecloudplatform/gcsfuse/v2/common"
 	"github.com/googlecloudplatform/gcsfuse/v2/internal/storage"
 	"github.com/googlecloudplatform/gcsfuse/v2/internal/storage/gcs"
 	. "github.com/jacobsa/ogletest"
@@ -92,7 +93,7 @@ func (t *BucketManagerTest) TestSetUpBucketMethod() {
 	bm.config = bucketConfig
 	bm.gcCtx = ctx
 
-	bucket, err := bm.SetUpBucket(context.Background(), TestBucketName, false)
+	bucket, err := bm.SetUpBucket(context.Background(), TestBucketName, false, common.NewNoopMetrics())
 
 	ExpectNe(nil, bucket.Syncer)
 	ExpectEq(nil, err)
@@ -116,7 +117,7 @@ func (t *BucketManagerTest) TestSetUpBucketMethod_IsMultiBucketMountTrue() {
 	bm.config = bucketConfig
 	bm.gcCtx = ctx
 
-	bucket, err := bm.SetUpBucket(context.Background(), TestBucketName, true)
+	bucket, err := bm.SetUpBucket(context.Background(), TestBucketName, true, common.NewNoopMetrics())
 
 	ExpectNe(nil, bucket.Syncer)
 	ExpectEq(nil, err)
@@ -140,7 +141,7 @@ func (t *BucketManagerTest) TestSetUpBucketMethodWhenBucketDoesNotExist() {
 	bm.config = bucketConfig
 	bm.gcCtx = ctx
 
-	bucket, err := bm.SetUpBucket(context.Background(), invalidBucketName, false)
+	bucket, err := bm.SetUpBucket(context.Background(), invalidBucketName, false, common.NewNoopMetrics())
 
 	ExpectEq("error in iterating through objects: storage: bucket doesn't exist", err.Error())
 	ExpectNe(nil, bucket.Syncer)
@@ -164,7 +165,7 @@ func (t *BucketManagerTest) TestSetUpBucketMethodWhenBucketDoesNotExist_IsMultiB
 	bm.config = bucketConfig
 	bm.gcCtx = ctx
 
-	bucket, err := bm.SetUpBucket(context.Background(), invalidBucketName, true)
+	bucket, err := bm.SetUpBucket(context.Background(), invalidBucketName, true, common.NewNoopMetrics())
 
 	ExpectEq("error in iterating through objects: storage: bucket doesn't exist", err.Error())
 	ExpectNe(nil, bucket.Syncer)
