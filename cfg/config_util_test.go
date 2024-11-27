@@ -15,6 +15,10 @@
 package cfg
 
 import (
+	"fmt"
+	"os"
+	"runtime"
+	"runtime/pprof"
 	"testing"
 	"time"
 
@@ -179,5 +183,24 @@ func TestIsTracingEnabled(t *testing.T) {
 				ExperimentalTracingMode: tc.traceMode,
 			}}))
 		})
+	}
+}
+
+func TestPerf(t *testing.T) {
+	go func() {
+		for {
+			dumpMemory()
+			time.Sleep(10 * time.Second)
+		}
+	}()
+}
+
+func dumpMemory() {
+	runtime.GC()
+	fmt.Println("Dumping memory")
+
+	// Dump to the file.
+	if err := pprof.Lookup("heap").WriteTo(os.Stderr, 1); err != nil {
+		fmt.Errorf("WriteTo: %w", err)
 	}
 }
