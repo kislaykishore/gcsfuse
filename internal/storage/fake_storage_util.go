@@ -15,6 +15,8 @@
 package storage
 
 import (
+	"sync"
+
 	"github.com/fsouza/fake-gcs-server/fakestorage"
 	"github.com/googlecloudplatform/gcsfuse/v2/internal/storage/gcs"
 )
@@ -45,6 +47,8 @@ const ContentInTestGzipObjectCompressed string = "\x1f\x8b\b\b\x9d\xab\xd5d\x02\
 const ContentInTestGzipObjectDecompressed string = "This\n"
 const TestGzipObjectGeneration int64 = 781
 
+var lock sync.Mutex
+
 type FakeStorage interface {
 	CreateStorageHandle() (sh StorageHandle)
 
@@ -56,11 +60,13 @@ type fakeStorage struct {
 }
 
 func (f *fakeStorage) CreateStorageHandle() (sh StorageHandle) {
+	lock.Lock()
 	sh = &storageClient{client: f.fakeStorageServer.Client()}
 	return
 }
 
 func (f *fakeStorage) ShutDown() {
+	lock.Unlock()
 	f.fakeStorageServer.Stop()
 }
 
